@@ -99,7 +99,15 @@ list(model_0.parameters()) # the values are the values they are becz we got rand
 model_0.state_dict()
 
 
-plot_predictions(predictions=model_0(X_test).detach().numpy())
+# predictions = inference
+with torch.inference_mode():
+    y_preds = model_0(X_test)
+
+
+y_preds,y_test
+
+
+plot_predictions(predictions=y_preds)
 
 
 
