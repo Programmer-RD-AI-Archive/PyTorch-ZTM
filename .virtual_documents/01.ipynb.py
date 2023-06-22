@@ -102,12 +102,25 @@ model_0.state_dict()
 # predictions = inference
 with torch.inference_mode():
     y_preds = model_0(X_test)
-
-
-y_preds,y_test
-
-
 plot_predictions(predictions=y_preds)
+
+
+list(model_0.parameters()),model_0.state_dict()
+
+
+loss_fn = nn.L1Loss()
+
+
+optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.001) 
+# learning rate = possibily th emost important hyper parameter, it is a value that we set our selves, the learning rate is 
+# smaller the learning rate the smaller the change done to parameters
+
+
+# the model gets to see the data once
+epochs = 1
+
+
+
 
 
 
