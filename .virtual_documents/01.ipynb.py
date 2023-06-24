@@ -29,10 +29,10 @@ bias = 0.3 # a
 # Create data
 
 start = 0.0
-end = 100.0
+end = 5.0
 step = 0.02
-X = torch.arange(start, end ,step).unsqueeze(dim=1)
-y = weight * X + bias
+X = torch.arange(start, end ,step).unsqueeze(dim=1).to('cuda')
+y = (weight * X + bias).to('cuda')
 
 
 X[:5], y[:5]
@@ -59,14 +59,14 @@ def plot_predictions(train_data=X_train,train_labels=y_train,test_data=X_test,te
     plt.figure(figsize=(10,7))
     
     # Plot trainings data in blue
-    plt.scatter(train_data,train_labels, c='b', s=10, label='Trainings data')
+    plt.scatter(train_data.cpu(),train_labels.cpu(), c='b', s=10, label='Trainings data')
     
     # Plot test data in green
-    plt.scatter(test_data, test_labels, c='g', s=10, label='Testing data')
+    plt.scatter(test_data.cpu(), test_labels.cpu(), c='g', s=10, label='Testing data')
     
     if predictions is not None:
         # Plot the predictions
-        plt.scatter(test_data,predictions,c='r', s=10, label='predictions')
+        plt.scatter(test_data.cpu(),predictions.cpu(),c='r', s=10, label='predictions')
     plt.legend(prop={"size":14})
 
 
@@ -85,13 +85,13 @@ class LinearRegressionModel(nn.Module): # <- almost everythhing in pytorch inher
         return self.weights * X + self.bias
 
 
-model = LinearRegressionModel()
+model = LinearRegressionModel().to('cuda')
 
 
 torch.manual_seed(42)
 
 # Create instance of the model
-model_0 = LinearRegressionModel()
+model_0 = LinearRegressionModel().to('cuda')
 
 list(model_0.parameters()) # the values are the values they are becz we got random val
 
@@ -101,8 +101,8 @@ model_0.state_dict()
 
 # predictions = inference
 with torch.inference_mode():
-    y_preds = model_0(X_test)
-plot_predictions(predictions=y_preds)
+    y_preds = model_0(X_test.to('cuda'))
+plot_predictions(predictions=y_preds.cpu())
 
 
 list(model_0.parameters()),model_0.state_dict()
@@ -111,18 +111,45 @@ list(model_0.parameters()),model_0.state_dict()
 loss_fn = nn.L1Loss()
 
 
-optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.001) 
+optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.01) 
 # learning rate = possibily th emost important hyper parameter, it is a value that we set our selves, the learning rate is 
 # smaller the learning rate the smaller the change done to parameters
 
 
+from tqdm import tqdm
 # the model gets to see the data once
 epochs = 100
 
 
-for epoch in range(epochs):
+for epoch in tqdm(range(epochs)):
     # Set model to training model
-    model_0.train() # requires gradients
+    model_0.train() # turns on gradient tracking
+    
+    # Forward pass
+    y_preds = model_0(X_train)
+    
+    # Calculaate the loss
+    loss = loss_fn(y_preds,y_train)
+    
+    # Optimizer zero grad
+    optimizer.zero_grad() # make sure that optimizer data doesnt add up, think as if its "C" so that it changes in every iteration
+    
+    # Back propagration
+    loss.backward()
+    
+    # Gradient Descent
+    optimizer.step()
+    
+    model_0.eval() # turns off gradient tracking
+
+
+y_preds[:5],y_train[:5]
+
+
+# predictions = inference
+with torch.inference_mode():
+    y_preds = model_0(X_test.to('cuda'))
+plot_predictions(predictions=y_preds.cpu())
 
 
 
