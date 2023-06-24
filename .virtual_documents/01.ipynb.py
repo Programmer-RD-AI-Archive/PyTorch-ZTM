@@ -29,7 +29,7 @@ bias = 0.3 # a
 # Create data
 
 start = 0.0
-end = 1.0
+end = 100.0
 step = 0.02
 X = torch.arange(start, end ,step).unsqueeze(dim=1)
 y = weight * X + bias
@@ -117,10 +117,12 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.001)
 
 
 # the model gets to see the data once
-epochs = 1
+epochs = 100
 
 
-
+for epoch in range(epochs):
+    # Set model to training model
+    model_0.train() # requires gradients
 
 
 
