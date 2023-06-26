@@ -29,7 +29,7 @@ bias = 0.3 # a
 # Create data
 
 start = 0.0
-end = 5.0
+end = 1.0
 step = 0.02
 X = torch.arange(start, end ,step).unsqueeze(dim=1).to('cuda')
 y = (weight * X + bias).to('cuda')
@@ -119,6 +119,9 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.01)
 from tqdm import tqdm
 # the model gets to see the data once
 epochs = 100
+epoch_count = []
+loss_values = []
+test_loss_values = []
 
 
 for epoch in tqdm(range(epochs)):
@@ -140,7 +143,20 @@ for epoch in tqdm(range(epochs)):
     # Gradient Descent
     optimizer.step()
     
-    model_0.eval() # turns off gradient tracking
+    model_0.eval() # turns off  stf like dropout and batchnormalisation
+    
+    with torch.inference_mode(): # turns off gradient tracking 
+        # 1. Do the forward pass
+        test_pred = model_0(X_test)
+        
+        # Calculate the loss
+        test_loss = loss_fn(test_pred,y_test)
+    
+    if epoch % 10 == 0:
+        epoch_count.append(epoch)
+        loss_values.append(loss.cpu().detach())
+        test_loss_values.append(test_loss.cpu().detach())
+        print(f"Epoch: {epoch} | Test : {test_loss} | Loss : {loss}")
 
 
 y_preds[:5],y_train[:5]
@@ -150,6 +166,34 @@ y_preds[:5],y_train[:5]
 with torch.inference_mode():
     y_preds = model_0(X_test.to('cuda'))
 plot_predictions(predictions=y_preds.cpu())
+
+
+model_0.state_dict()
+
+
+weight,bias
+
+
+# Plot the loss curves
+plt.plot(epoch_count,loss_values,label='Train Loss')
+plt.plot(epoch_count,test_loss_values,label='Test Loss')
+plt.title("Loss Curves")
+plt.ylabel("Loss")
+plt.xlabel("Epochs")
+plt.legend()
+
+
+# Saving out PyTorch model
+torch.save(model.state_dict(),'./models/01/00.pth')
+
+
+state_dict_00 = torch.load("./models/01/00.pth")
+
+
+model_01 = LinearRegressionModel()
+
+
+model_01.load_state_dict(state_dict_00)
 
 
 
