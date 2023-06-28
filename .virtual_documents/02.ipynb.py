@@ -95,4 +95,25 @@ untrained_preds = model_0(X_test)
 untrained_preds[0],y_test[0]
 
 
+loss_fn = nn.BCEWithLogitsLoss() # has the sigmoid function builtin
+# BCELoss() requries sigmoid to be builtin to the model itself
+
+
+optimizer = torch.optim.SGD(model_0.parameters(),lr=0.01)
+
+
+epochs = 100
+batch_size = 32
+
+
+# Calculate accuracy
+def accuracy_fn(y_true,y_preds):
+    correct = torch.eq(y_true,y_preds).sum().item() # gives a False True list -> Tensor no. of true > just normal no.
+    acc = correct/len(y_preds)*100
+    return acc
+
+
+
+
+
 
