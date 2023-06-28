@@ -1,8 +1,8 @@
 import sklearn
 from sklearn.datasets import make_circles
 # Make 100 Samples
-n_samples = 10000
-X,y = make_circles(n_samples,noise=0.125,random_state=42)
+n_samples = 25000
+X,y = make_circles(n_samples,noise=0.0625,random_state=42)
 
 
 import matplotlib.pyplot as plt
@@ -67,11 +67,13 @@ device
 class CircleModelV0(nn.Module):
     def __init__(self):
         super().__init__()
-        self.layer_1 = nn.Linear(2,1024) # 
-        self.layer_2 = nn.Linear(1024,1)
+        self.layer_1 = nn.Linear(2,2048) # 
+        self.layer_2 = nn.Linear(2048,1)
+        self.relu = nn.ReLU()
     
     def forward(self,X):
-        return self.layer_2(self.layer_1(X)) # x -> layer_1 -> layer_2
+        # return self.layer_2(self.relu(self.layer_1(X))) # x -> layer_1 -> layer_2
+        return self.layer_2(self.layer_1(X))
 
 
 model_0 = CircleModelV0().to(device)
@@ -83,10 +85,10 @@ model_0
 list(model_0.parameters())
 
 
-model_0 = nn.Sequential(
-    nn.Linear(in_features=2,out_features=64),
-    nn.Linear(64,1)
-).to(device)
+# model_0 = nn.Sequential(
+#     nn.Linear(in_features=2,out_features=64),
+#     nn.Linear(64,1)
+# ).to(device)
 
 
 untrained_preds = model_0(X_test)
@@ -99,10 +101,10 @@ loss_fn = nn.BCEWithLogitsLoss() # has the sigmoid function builtin
 # BCELoss() requries sigmoid to be builtin to the model itself
 
 
-optimizer = torch.optim.SGD(model_0.parameters(),lr=0.01)
+optimizer = torch.optim.Adam(model_0.parameters())
 
 
-epochs = 100
+epochs = 10
 batch_size = 32
 
 
@@ -113,7 +115,174 @@ def accuracy_fn(y_true,y_preds):
     return acc
 
 
+y_logits = model_0(X_test)
 
+
+y_preds_probs = torch.sigmoid(y_logits)
+
+
+y_preds_probs.round()
+
+
+y_pred_labels = torch.round(torch.sigmoid(model_0(X_test)))
+
+
+y_preds = torch.round(y_preds_probs)
+
+
+y_preds.squeeze()
+
+
+test_loss_iter = []
+train_loss_iter = []
+train_accuracy_iter = []
+test_accuracy_iter = []
+
+
+from tqdm import tqdm
+
+
+# get_ipython().run_line_magic("%time", "")
+# epochs = 100
+# batch_size = 32
+
+# for epoch in tqdm(range(epochs)):
+#     for i in range(0,len(X_train),batch_size):
+#         X_batch = X_train[i:i+batch_size]
+#         y_batch = y_train[i:i+batch_size]
+#         preds = model_0(X_batch)
+#         true_preds = torch.round(torch.sigmoid(preds.squeeze()))
+#         loss = loss_fn(preds.squeeze(),y_batch.squeeze())
+#         optimizer.zero_grad()
+#         loss.backward()
+#         optimizer.step()
+#     with torch.inference_mode():
+#         y_test_preds = model_0(X_test)
+#         loss_test = loss_fn(y_test_preds.squeeze(),y_test.squeeze())
+#         true_test_preds = torch.round(torch.sigmoid(y_test_preds))
+#     train_loss_iter.append(loss.cpu().detach().numpy())
+#     test_loss_iter.append(loss_test.cpu().detach().numpy())
+#     train_accuracy_iter.append(accuracy_fn(y_batch,true_preds))
+#     test_accuracy_iter.append(accuracy_fn(y_test,true_test_preds))
+
+
+for epoch in tqdm(range(epochs)):
+    model_0.train()
+    y_logists = model_0(X_train).squeeze()
+    y_pred = torch.round(torch.sigmoid(y_logits))
+    loss = loss_fn(y_logists,y_train)
+    acc = accuracy_fn(y_true=y_train,y_preds=y_pred)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    model_0.eval()
+    with torch.inference_mode():
+        test_logits = model_0(X_test).squeeze()
+        test_pred = torch.round(torch.sigmoid(test_logits))
+        
+        test_loss = loss_fn(test_logits,y_test)
+        test_acc = accuracy_fn(y_true=y_test,y_preds=test_pred)
+        
+print(f"""
+        Loss : {loss}
+        Accuracy : {acc}
+        Test Loss : {test_loss}
+        Test Accuracy : {test_acc}
+        """)
+
+
+import requests
+from pathlib import Path
+
+# Download helper functions from PyTorch repo
+if not Path("helper_functions.py").is_file():
+    request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/main/helper_functions.py")
+    with open("helper_functions.py","wb") as f:
+        f.write(request.content)
+
+
+from helper_functions import *
+
+
+plt.figure(figsize=(12,6))
+plt.subplot(1,2,1)
+plt.title("Train")
+plot_decision_boundary(model_0,X_train,y_train)
+plt.subplot(1,2,2)
+plt.title("Test")
+plot_decision_boundary(model_0,X_test,y_test)
+
+
+class ClassificationModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.activation = nn.ReLU()
+        self.linear1 = nn.Linear(2,256)
+        self.linear2 = nn.Linear(256,512)
+        self.linear3 = nn.Linear(512,1024)
+        self.linear4 = nn.Linear(1024,512)
+        self.linear5_output = nn.Linear(512,1)
+    
+    def forward(self,X):
+        X = self.activation(self.linear1(X))
+        X = self.activation(self.linear2(X))
+        X = self.activation(self.linear3(X))
+        X = self.activation(self.linear4(X))
+        X = self.linear5_output(X)
+        return X
+
+
+model = ClassificationModel().to(device)
+criterion = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.Adam(model.parameters())
+
+
+epochs = 150
+batch_size = 32
+
+
+import wandb
+
+
+wandb.init(project="02",name="Adjusted")
+for epoch in tqdm(range(epochs)):
+    for i in range(0,len(X_train),batch_size):
+        torch.cuda.empty_cache()
+        model.train()
+        X_batch = X_train[i:i+batch_size]
+        y_batch = y_train[i:i+batch_size]
+        preds = model(X_batch).squeeze()
+        norm_preds = torch.round(torch.sigmoid(preds))
+        loss = criterion(preds,y_batch)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        model.eval()
+        with torch.inference_mode():
+            train_preds = model(X_train).squeeze()
+            test_preds = model(X_test).squeeze()
+            loss_test = criterion(test_preds,y_test)
+            loss_train = criterion(train_preds,y_train)
+            train_preds = torch.round(torch.sigmoid(train_preds))
+            test_preds = torch.round(torch.sigmoid(test_preds))
+            acc_train = accuracy_fn(y_train,train_preds)
+            acc_test = accuracy_fn(y_test,test_preds)
+            wandb.log({
+                "Train Loss":loss_train,
+                "Test Loss":loss_test,
+                "Train Accuracy": acc_train,
+                "Test Accuracy": acc_test
+            })
+wandb.finish()
+
+
+plt.figure(figsize=(12,6))
+plt.subplot(1,2,1)
+plt.title("Train")
+plot_decision_boundary(model_0,X_train,y_train)
+plt.subplot(1,2,2)
+plt.title("Test")
+plot_decision_boundary(model_0,X_test,y_test)
 
 
 
