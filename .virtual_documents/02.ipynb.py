@@ -1,7 +1,7 @@
 import sklearn
 from sklearn.datasets import make_circles
 # Make 100 Samples
-n_samples = 25000
+n_samples = 10000
 X,y = make_circles(n_samples,noise=0.0625,random_state=42)
 
 
@@ -237,7 +237,7 @@ criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters())
 
 
-epochs = 150
+epochs = 1
 batch_size = 32
 
 
@@ -279,10 +279,150 @@ wandb.finish()
 plt.figure(figsize=(12,6))
 plt.subplot(1,2,1)
 plt.title("Train")
-plot_decision_boundary(model_0,X_train,y_train)
+plot_decision_boundary(model,X_train,y_train)
 plt.subplot(1,2,2)
 plt.title("Test")
-plot_decision_boundary(model_0,X_test,y_test)
+plot_decision_boundary(model,X_test,y_test)
+
+
+torch.max(torch.tensor(0),torch.tensor(4))
+
+
+# Create a tensor
+A = torch.arange(-10,10)
+
+
+A.dtype
+
+
+A
+
+
+plt.plot(A)
+
+
+plt.plot(torch.relu(A))
+
+
+def relu(X):
+    return torch.max(torch.tensor(0),X)
+
+
+plt.plot(relu(A))
+
+
+def sigmoid(X):
+    return 1 / (1  + torch.exp(-X))
+
+
+plt.plot(sigmoid(A))
+
+
+torch.exp(torch.tensor(1))
+
+
+from sklearn.datasets import make_blobs
+
+
+NUM_CLASSES = 4  
+NUM_FEATURES = 2
+
+
+X,y = make_blobs(n_samples=1000,n_features=NUM_FEATURES,centers=NUM_CLASSES,cluster_std=1,random_state=42)
+plt.figure(figsize=(10,7))
+plt.scatter(X[:,0],X[:,1],c=y,cmap = plt.cm.RdYlBu)
+# X is the cordinate spaces and y is used to assign each of the points a class (label)
+
+
+X,y = torch.from_numpy(X).type(torch.float).to(device),torch.tensor(y).type(torch.float).to(device)
+
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.125)
+
+
+class BlobModel(nn.Module):
+    def __init__(self,input_features=2,output_features=4,hidden_units=1024):
+        super().__init__()
+        self.linear_layer_stack = nn.Sequential(
+            nn.Linear(input_features,hidden_units),
+            nn.ReLU(),
+            nn.Linear(hidden_units,hidden_units * 2),
+            nn.ReLU(),
+            nn.Linear(hidden_units * 2, output_features)
+        )
+    
+    def forward(self,X):
+        return self.linear_layer_stack(X)
+
+
+model = BlobModel().to(device)
+criterion = nn.CrossEntropyLoss().to(device)
+optimizer = torch.optim.Adam(model.parameters(),lr=0.01)
+
+
+epochs = 100
+batch_size = 32
+
+
+y_preds = model(X_test)
+
+
+y_pred_probs = torch.softmax(y_preds,dim=1)
+
+
+torch.argmax(y_pred_probs[0]),y_pred_probs[0]
+
+
+# Conver models preditions probabilities to prediction labels
+y_preds = torch.argmax(y_pred_probs,dim=1)
+
+
+y_pred_probs.shape
+
+
+y_preds
+
+
+# Fit the multi-class model to the data
+torch.manual_seed(42)
+torch.cuda.manual_seed(42)
+
+# Set number of epochs 
+epochs = 100
+
+# Put data to the target device
+X_blob_train, y_blob_train = X_train.to(device), y_train.to(device)
+X_blob_test, y_blob_test = X_test.to(device), y_test.to(device)
+
+# Loop through data
+for epoch in range(epochs):
+  ### Training 
+  model.train()
+
+  y_logits = model(X_blob_train)
+  y_pred = torch.softmax(y_logits, dim=1).argmax(dim=1)
+
+  loss = loss_fn(y_logits, y_blob_train)
+  acc = accuracy_fn(y_true=y_blob_train,
+                    y_pred=y_pred)
+  
+  optimizer.zero_grad()
+  loss.backward()
+  optimizer.step()
+
+  ### Testing
+  model.eval()
+  with torch.inference_mode():
+    test_logits = model(X_blob_test)
+    test_preds = torch.softmax(test_logits, dim=1).argmax(dim=1)
+    
+    test_loss = loss_fn(test_logits, y_blob_test)
+    test_acc = accuracy_fn(y_true=y_blob_test,
+                           y_pred=test_preds)
+    
+  # Print out what's happenin'
+  if epoch % 10 == 0:
+    print(f"Epoch: {epoch} | Loss: {loss:.4f}, Acc: {acc:.2f}% | Test loss: {test_loss:.4f}, Test acc: {test_acc:.2f}get_ipython().run_line_magic("")", "")
 
 
 
