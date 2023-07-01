@@ -164,7 +164,7 @@ hstspreload==2021.12.1
 html5lib==1.1
 httpcore==0.9.1
 httplib2==0.20.2
-httpx==0.13.3
+httpx==0.23.0
 huggingface-hub==0.6.0
 humanfriendly==10.0
 hydra-core==1.1.1
