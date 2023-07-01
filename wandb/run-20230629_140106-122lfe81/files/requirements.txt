@@ -473,7 +473,7 @@ websocket-client==1.2.3
 websockets==8.1
 werkzeug==2.0.1
 wget==3.2
-wheel==0.37.1
+wheel==0.38.1
 widgetsnbextension==3.5.2
 wrapt==1.14.1
 wtforms==2.3.3
