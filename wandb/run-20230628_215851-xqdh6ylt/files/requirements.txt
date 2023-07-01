@@ -125,7 +125,7 @@ flask-restful==0.3.9
 flask-security==3.0.0
 flask-simple-geoip==0.2.4
 flask-wtf==0.15.1
-flask==2.0.1
+flask==2.2.5
 flatbuffers==2.0
 fonttools==4.28.2
 frozenlist==1.2.0
