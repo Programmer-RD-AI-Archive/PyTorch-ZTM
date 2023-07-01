@@ -1,0 +1,66 @@
+diff --git a/.ipynb_checkpoints/02-checkpoint.ipynb b/.ipynb_checkpoints/02-checkpoint.ipynb
+index fbe990a..525ba4a 100644
+--- a/.ipynb_checkpoints/02-checkpoint.ipynb
++++ b/.ipynb_checkpoints/02-checkpoint.ipynb
+@@ -916,7 +916,7 @@
+    "metadata": {},
+    "outputs": [],
+    "source": [
+-    "epochs = 1\n",
++    "epochs = 250\n",
+     "batch_size = 32"
+    ]
+   },
+diff --git a/.virtual_documents/02.ipynb.py b/.virtual_documents/02.ipynb.py
+index ebce0a7..63075fb 100644
+--- a/.virtual_documents/02.ipynb.py
++++ b/.virtual_documents/02.ipynb.py
+@@ -237,7 +237,7 @@ criterion = nn.BCEWithLogitsLoss()
+ optimizer = torch.optim.Adam(model.parameters())
+ 
+ 
+-epochs = 1
++epochs = 250
+ batch_size = 32
+ 
+ 
+diff --git a/02.ipynb b/02.ipynb
+index fbe990a..525ba4a 100644
+--- a/02.ipynb
++++ b/02.ipynb
+@@ -916,7 +916,7 @@
+    "metadata": {},
+    "outputs": [],
+    "source": [
+-    "epochs = 1\n",
++    "epochs = 250\n",
+     "batch_size = 32"
+    ]
+   },
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index 7b6d029..b235f38 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20230629_140106-122lfe81/logs/debug-internal.log
+\ No newline at end of file
++run-20230630_223934-26o5y4j0/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index d7e72c3..d261850 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20230629_140106-122lfe81/logs/debug.log
+\ No newline at end of file
++run-20230630_223934-26o5y4j0/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index e199032..b985bbc 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20230629_140106-122lfe81
+\ No newline at end of file
++run-20230630_223934-26o5y4j0
+\ No newline at end of file

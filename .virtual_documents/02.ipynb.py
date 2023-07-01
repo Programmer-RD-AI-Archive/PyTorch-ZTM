@@ -237,7 +237,7 @@ criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters())
 
 
-epochs = 1
+epochs = 250
 batch_size = 32
 
 

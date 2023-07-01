@@ -1,0 +1,26 @@
+{
+    "os": "Linux-5.15.0-50-generic-x86_64-with-glibc2.10",
+    "python": "3.8.8",
+    "heartbeatAt": "2023-06-30T17:09:39.060145",
+    "startedAt": "2023-06-30T17:09:34.066225",
+    "docker": null,
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "gpu_count": 1,
+    "cpu_count": 6,
+    "cuda": null,
+    "args": [
+        "-f",
+        "/home/indika/.local/share/jupyter/runtime/kernel-8c0af684-5262-460d-a160-484e9bde2564.json"
+    ],
+    "state": "running",
+    "program": "02.ipynb",
+    "root": "/media/indika/Sync/Programmer-RD-AI/Programming/Learning/Pytorch",
+    "git": {
+        "remote": "https://github.com/Programmer-RD-AI/PyTorch-ZTM.git",
+        "commit": "f00f3a62e4d8a9410514a5569fe9d3a26f1bf053"
+    },
+    "email": "go2ranuga@gmail.com",
+    "host": "programmer-rd-ai",
+    "username": "indika",
+    "executable": "/media/indika/Sync/anaconda3/bin/python3.8"
+}
