@@ -87,7 +87,7 @@ dlib==19.22.1
 dm-tree==0.1.6
 docker-pycreds==0.4.0
 docutils==0.16
-dparse==0.5.1
+dparse==0.5.2
 dulwich==0.20.26
 duplicity==0.8.12.0
 empy==3.3.4
