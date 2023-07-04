@@ -315,7 +315,7 @@ prometheus-client==0.13.1
 promise==2.3
 prompt-toolkit==3.0.20
 proto-plus==1.19.8
-protobuf==3.19.1
+protobuf==3.19.5
 psutil==5.8.0
 ptyprocess==0.7.0
 py==1.11.0
