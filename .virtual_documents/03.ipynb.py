@@ -115,6 +115,11 @@ dummy_X = torch.rand([1,1,28,28])
 model_0(dummy_X)
 
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 from helper_functions import *
 
 
@@ -565,7 +570,17 @@ y_pred_tensor = torch.cat(y_preds)
 y_pred_tensor[:10]
 
 
+<<<<<<< Updated upstream
 get_ipython().getoutput("pip install torchmetrics mlxtend")
 
 
+=======
+
+
+
+get_ipython().getoutput("pip install torchmetrics mlxtend")
+
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
