@@ -228,7 +228,7 @@ llvmlite==0.38.0
 locket==0.2.1
 lxml==4.8.0
 mailer==0.8.1
-mako==1.1.6
+mako==1.2.2
 markdown==3.3.6
 markupsafe==2.0.1
 marshmallow-enum==1.5.1
