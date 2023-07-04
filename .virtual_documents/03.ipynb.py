@@ -115,11 +115,6 @@ dummy_X = torch.rand([1,1,28,28])
 model_0(dummy_X)
 
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 from helper_functions import *
 
 
@@ -570,17 +565,23 @@ y_pred_tensor = torch.cat(y_preds)
 y_pred_tensor[:10]
 
 
-<<<<<<< Updated upstream
-get_ipython().getoutput("pip install torchmetrics mlxtend")
+import torchmetrics,mlxtend
 
 
-=======
+mlxtend.__version__
 
 
+torchmetrics.__version__
 
-get_ipython().getoutput("pip install torchmetrics mlxtend")
+
+get_ipython().getoutput("pip install mlxtend==0.19.0")
 
 
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+from torchmetrics  import ConfusionMatrix
+from mlxtend.plotting import plot_confusion_matrix
+confmat = ConfusionMatrix(num_classes=len(class_names))
+confmat_tensor = confmat(preds=y_pred_tensor,target=test_data.targets)
+fig,ax = plot_confusion_matrix(conf_mat=confmat_tensor.numoy(),class_names=class_names,figsize=(10,7))
+
+
 
