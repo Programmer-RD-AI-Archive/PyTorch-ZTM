@@ -232,10 +232,10 @@ def eval_model(model:torch.nn.Module,
         # Scale loss and acc to find average loss/acc per batch
         loss = loss / len(data_loader)
         acc = acc / len(data_loader)
-    return {f"{train_or_loss} model_loss":loss.item(),f"{train_or_loss} model_acc":acc} # "model_name":model.__class__.__name__,
+    return {f"{train_or_loss} model_loss":loss.item(),f"{train_or_loss} model_acc":acc,"model_name":model.__class__.__name__,}
 
 
-# eval_model(model=model_0,data_loader=test_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="test")
+model_0_results = eval_model(model=model_0.to(device),data_loader=test_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="test")
 
 
 # eval_model(model=model_0,data_loader=train_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="train")
@@ -273,7 +273,7 @@ class FashionMNIST01(nn.Module):
 model_1 = FashionMNIST01().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model_1.parameters(),lr=0.01)
-epochs = 10
+epochs = 1
 
 
 import wandb
@@ -291,8 +291,8 @@ for epoch in tqdm(range(epochs)):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-    wandb.log(eval_model(model=model_1,data_loader=test_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="test"))
-    wandb.log(eval_model(model=model_1,data_loader=train_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="train"))
+    # wandb.log(eval_model(model=model_1,data_loader=test_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="test"))
+    # wandb.log(eval_model(model=model_1,data_loader=train_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="train"))
 wandb.finish()
 
 
@@ -323,56 +323,82 @@ def test_step(dataloader:torch.utils.data.DataLoader,model:nn.Module,accuracy_fn
     return test_loss,test_acc
 
 
-eval_model(model=model_1,data_loader=test_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="test")
+model_1_results = eval_model(model=model_1,data_loader=test_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="test")
 
 
 eval_model(model=model_1,data_loader=train_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="train")
 
 
-class TinyVGG(nn.Module):
-    def __init__(self,input_shape:int,hidden_units:int,output_shape:int):
-        super().__init__()
-        self.convblock1 = nn.Sequential(
-            nn.Conv2d(in_channels=input_shape,out_channels=hidden_units,kernel_size=(3,3),padding=2,stride=1),
-            nn.BatchNorm2d(hidden_units),
-            nn.ReLU()
-        )
-        self.convblock2 = nn.Sequential(
-            nn.Conv2d(in_channels=hidden_units,out_channels=hidden_units*2,kernel_size=(3,3),padding=2,stride=1),
-            nn.BatchNorm2d(hidden_units*2),
-            nn.ReLU(),
-            nn.MaxPool2d((2,2))
-        )
-        self.convblock3 = nn.Sequential(
-            nn.Conv2d(in_channels=hidden_units*2,out_channels=hidden_units*3,kernel_size=(3,3),padding=2,stride=1),
-            nn.BatchNorm2d(hidden_units*3),
-            nn.ReLU()
-        )
-        self.convblock4 = nn.Sequential(
-            nn.Conv2d(in_channels=hidden_units*3,out_channels=hidden_units*4,kernel_size=(3,3),padding=2,stride=1),
-            nn.BatchNorm2d(hidden_units*4),
-            nn.ReLU(),
-            nn.MaxPool2d((2,2))
-        )
-        self.linearout = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(hidden_units,output_shape),
-        )
-        
-    def forward(self,X):
-        X = self.convblock1(X)
-        X = self.convblock2(X)
-        X = self.convblock3(X)
-        X = self.convblock4(X)
-        print(X.shape)
-        X = self.linearout(X)
-        return X
+# Create a convolutional neural network
+class FashionMNISTModelV2(nn.Module):
+  """
+  Model architecture that replicates the TinyVGG
+  model from CNN explainer website.
+  """
+  def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
+    super().__init__()
+    self.conv_block_1 = nn.Sequential(
+        # Create a conv layer - https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
+        nn.Conv2d(in_channels=input_shape, 
+                  out_channels=hidden_units,
+                  kernel_size=3,
+                  stride=1,
+                  padding=1), # values we can set ourselves in our NN's are called hyperparameters
+        nn.ReLU(),
+        nn.Conv2d(in_channels=hidden_units,
+                  out_channels=hidden_units,
+                  kernel_size=3,
+                  stride=1,
+                  padding=1),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2)
+    )
+    self.conv_block_2 = nn.Sequential(
+        nn.Conv2d(in_channels=hidden_units,
+                  out_channels=hidden_units,
+                  kernel_size=3,
+                  stride=1,
+                  padding=1),
+        nn.ReLU(),
+        nn.Conv2d(in_channels=hidden_units,
+                  out_channels=hidden_units,
+                  kernel_size=3,
+                  stride=1,
+                  padding=1),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2)
+    )
+    self.classifier = nn.Sequential(
+        nn.Flatten(),
+        nn.Linear(in_features=hidden_units*7*7, # there's a trick to calculating this...
+                  out_features=256),
+        nn.ReLU(),
+        nn.Linear(256,512),
+        nn.ReLU(),
+        nn.Linear(512,1024),
+        nn.ReLU(),
+        nn.Linear(1024,512),
+        nn.ReLU(),
+        nn.Linear(512,output_shape)
+    )
+
+  def forward(self, x):
+    x = self.conv_block_1(x)
+    # print(f"Output shape of conv_block_1: {x.shape}")
+    x = self.conv_block_2(x) 
+    # print(f"Output shape of conv_block_2: {x.shape}")
+    x = self.classifier(x)
+    # print(f"Output shape of classifier: {x.shape}")
+    return x
 
 
-model = TinyVGG(1,8,len(class_names)).to(device)
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(),lr=0.01)
-epochs = 100
+# model = FashionMNISTModelV2(input_shape=1,
+#                               hidden_units=10,
+#                               output_shape=len(class_names)).to(device)
+# criterion = nn.CrossEntropyLoss()
+# optimizer = torch.optim.SGD(params=model.parameters(),
+#                             lr=0.1)
+# epochs = 100
 
 
 torch.manual_seed(42)
@@ -419,7 +445,127 @@ rand_image_tensor = torch.randn(size=(1,28,28))
 rand_image_tensor.shape
 
 
-model(rand_image_tensor.unsqueeze(0).to(device))
+# model(rand_image_tensor.unsqueeze(0).to(device))
+
+
+model = FashionMNISTModelV2(input_shape=1,
+                              hidden_units=256,
+                              output_shape=len(class_names)).to(device)
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(params=model.parameters(),
+                            lr=0.1)
+epochs = 15
+
+
+wandb.init(project="03",name="CNN")
+for epoch in tqdm(range(epochs)):
+    for X_batch,y_batch in train_dataloader:
+        torch.cuda.empty_cache()
+        X_batch = X_batch.to(device)
+        y_batch = y_batch.to(device)
+        y_logits = model(X_batch)
+        preds = torch.argmax(y_logits,dim=1)
+        loss = criterion(y_logits,y_batch)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    with torch.inference_mode():
+        total_loss = 0
+        total_accuracy = 0
+        for X_test,y_test in test_dataloader:
+            preds = model(X_test.to(device))
+            loss = criterion(preds.to(device),y_test.to(device))
+            total_loss += loss
+            preds = torch.argmax(preds,dim=1)
+            total_accuracy += accuracy_fn(y_true=y_test.to(device), y_pred=preds.to(device))
+        accuracy_test = total_accuracy / (len(test_data)/32)
+        loss_test = total_loss / (len(test_data)/32)
+        total_loss = 0
+        total_accuracy = 0
+        for X_train,y_train in train_dataloader:
+            preds = model(X_train.to(device))
+            loss = criterion(preds.to(device),y_train.to(device))
+            total_loss += loss
+            preds = torch.argmax(preds,dim=1)
+            total_accuracy += accuracy_fn(y_true=y_train.to(device), y_pred=preds.to(device))
+        accuracy_train = total_accuracy / (len(train_data)/32)
+        loss_train = total_loss / (len(train_data)/32)
+    wandb.log({
+        "train model_loss":loss_train,
+        "test model_acc":accuracy_test,
+        "test model_loss":loss_test,
+        "train model_acc":accuracy_train
+    })
+wandb.finish()
+
+
+model_2_results = eval_model(model=model_1,data_loader=test_dataloader,loss_fn=loss_fn,accuracy_fn=accuracy_fn,train_or_loss="test")
+import pandas as pd
+compare_results = pd.DataFrame([model_0_results,model_1_results,model_2_results])
+compare_results
+
+
+compare_results.set_index("test model_loss")
+
+
+def make_predictions(model,data,device):
+    pred_probs = []
+    model.to(device)
+    model.eval()
+    with torch.inference_mode():
+        for sample in data:
+            sample = torch.unsqueeze(sample,dim=0).to(device)
+            pred_logits = model(sample)
+            pred_prob = torch.softmax(pred_logits.squeeze(),dim=0)
+            pred_probs.append(pred_prob.cpu())
+    return torch.stack(pred_probs)
+
+
+import random
+test_samples = []
+test_labels = []
+for sample,label in random.sample(list(test_data),k=9):
+    test_samples.append(sample)
+    test_labels.append(label)
+
+
+plt.imshow(test_samples[0].squeeze(),cmap="gray")
+plt.title(class_names[test_labels[0]])
+
+
+pred_probs = make_predictions(model=model,data=test_samples,device=device)
+pred_clases = pred_probs.argmax(dim=1)
+plt.figure(figsize=(9,9))
+nrows=3
+ncols = 3
+for i,sample in enumerate(test_samples):
+    plt.subplot(nrows,ncols,i+1)
+    plt.imshow(sample.squeeze(),cmap="gray")
+    pred_label = class_names[pred_clases[i]]
+    truth_labe = class_names[test_labels[i]]
+    title_text = f"Correct : {truth_labe} | Model : {pred_label}"
+    if pred_label == truth_labe:
+        plt.title(title_text,fontsize=10,c='g')
+    else:
+        plt.title(title_text,fontsize=10,c='r')
+    plt.axis(False);
+
+
+from tqdm import tqdm
+
+y_preds = []
+model.eval()
+with torch.inference_mode():
+    for X,y in tqdm(test_dataloader,desc="Making predictions..."):
+        X,y = X.to(device),y.to(device)
+        y_logit = model(X)
+        y_pred = torch.softmax(y_logit.squeeze(),dim=0).argmax(dim=1)
+        y_preds.append(y_pred.to('cpu'))
+y_pred_tensor = torch.cat(y_preds)
+y_pred_tensor[:10]
+
+
+get_ipython().getoutput("pip install torchmetrics mlxtend")
 
 
 
