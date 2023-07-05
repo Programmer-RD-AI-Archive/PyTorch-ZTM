@@ -136,7 +136,7 @@ googletrans==3.0.0
 gpg===1.13.1-unknown
 gpustat @ git+https://github.com/wookayin/gpustat.git@7c09a0fa467c23cba0d2dd0be820f5a82c58a283
 greenlet==1.1.2
-grpcio==1.43.0
+grpcio==1.53.0
 grpcio-status==1.43.0
 gTTS==2.2.3
 gunicorn==20.1.0
