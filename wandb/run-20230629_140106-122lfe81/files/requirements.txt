@@ -447,7 +447,7 @@ torch==1.9.1
 torchaudio==0.9.0a0+a85b239
 torchmetrics==0.5.1
 torchvision==0.10.1
-tornado==6.3.2
+tornado==6.3.3
 tqdm==4.62.3
 traitlets==5.1.1
 transformers==4.30.0
