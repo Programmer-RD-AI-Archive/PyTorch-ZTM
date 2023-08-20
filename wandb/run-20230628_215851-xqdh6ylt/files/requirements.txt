@@ -332,7 +332,7 @@ pydocstyle==6.1.1
 pydot==1.4.2
 pyerfa==2.0.0
 pyflakes==2.2.0
-pygments==2.11.2
+pygments==2.15.0
 pyjwt==1.7.1
 pylint==2.12.2
 pyls-black==0.4.6
