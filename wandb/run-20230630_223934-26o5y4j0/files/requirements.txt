@@ -198,7 +198,7 @@ json5==0.9.6
 jsonschema==4.2.1
 jupyter-client==7.1.0
 jupyter-console==6.4.3
-jupyter-core==4.9.1
+jupyter-core==4.11.2
 jupyter-kite==1.2.0
 jupyter-packaging==0.7.12
 jupyter-server==1.12.0
