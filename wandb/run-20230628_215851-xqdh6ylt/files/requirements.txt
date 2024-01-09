@@ -127,7 +127,7 @@ flask-simple-geoip==0.2.4
 flask-wtf==0.15.1
 flask==2.2.5
 flatbuffers==2.0
-fonttools==4.28.2
+fonttools==4.43.0
 frozenlist==1.2.0
 fsspec==2022.2.0
 furl==2.1.3
