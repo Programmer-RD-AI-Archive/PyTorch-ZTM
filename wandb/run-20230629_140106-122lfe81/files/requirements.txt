@@ -19,7 +19,7 @@ argon2-cffi==21.1.0
 asn1crypto==1.5.1
 astor==0.8.1
 astroid==2.9.0
-astropy==4.2.1
+astropy==5.3.3
 astunparse==1.6.3
 async-generator==1.10
 atomicwrites==1.4.0
