@@ -170,7 +170,7 @@ humanfriendly==10.0
 hydra-core==1.1.1
 hyperframe==5.2.0
 identify==2.4.0
-idna==2.10
+idna==3.7
 imageai==2.1.6
 imageio-ffmpeg==0.4.5
 imageio==2.9.0
