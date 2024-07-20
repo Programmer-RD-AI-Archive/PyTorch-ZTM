@@ -367,7 +367,7 @@ SecretStorage==3.3.1
 Send2Trash==1.8.0
 sendgrid==6.9.7
 sentencepiece==0.1.96
-sentry-sdk==1.5.0
+sentry-sdk==2.8.0
 setproctitle==1.2.3
 setuptools-scm==6.3.2
 sgt-launcher==0.2.5
