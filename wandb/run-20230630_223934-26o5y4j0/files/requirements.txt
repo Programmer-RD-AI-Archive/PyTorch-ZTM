@@ -121,7 +121,7 @@ flask-login==0.5.0
 flask-mail==0.9.1
 flask-mobility==1.1.0
 flask-principal==0.4.0
-flask-restful==0.3.9
+flask-restful==0.3.10
 flask-security==3.0.0
 flask-simple-geoip==0.2.4
 flask-wtf==0.15.1
