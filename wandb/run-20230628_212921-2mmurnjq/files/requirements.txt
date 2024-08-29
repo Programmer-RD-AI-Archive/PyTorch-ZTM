@@ -226,7 +226,7 @@ lightning-bolts==0.4.0
 livereload==2.6.3
 llvmlite==0.38.0
 locket==0.2.1
-lxml==4.8.0
+lxml==4.9.1
 mailer==0.8.1
 mako==1.1.6
 markdown==3.3.6
