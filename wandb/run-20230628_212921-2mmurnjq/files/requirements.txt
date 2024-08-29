@@ -300,7 +300,7 @@ pep8==1.7.1
 pexpect==4.8.0
 phonenumbers==8.12.29
 pickleshare==0.7.5
-pillow==8.3.1
+pillow==9.0.1
 pip-review==1.1.0
 pip==22.2.2
 pkginfo==1.8.2
