@@ -77,7 +77,7 @@ debugpy==1.5.1
 decorator==5.0.9
 defer==1.0.6
 defusedxml==0.7.1
-Deprecated==1.2.13
+Deprecated==1.2.15
 dill==0.3.4
 discord.py @ file:///media/indika/Sync/Programmer-RD-AI/Programming/Projects/Python/All/Land-On-Life/ML/checking/bot/discord.py
 distlib==0.3.3
